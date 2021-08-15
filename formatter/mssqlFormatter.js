@@ -79,6 +79,4 @@ const getSchemaVariable = (schemaUId) =>
 const getSchmeaVariableName = () =>
     "rightsSchemaUId"
 
-module.exports = {
-    generateScript
-}
+export default generateScript;

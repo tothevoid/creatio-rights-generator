@@ -1,4 +1,4 @@
-export const generateScript = (tableCaption, schemaUId, rights) => {
+const generateScript = (tableCaption, schemaUId, rights) => {
     const headerRows = getHeaderRows(tableCaption, rights);
     const scriptRows = getScriptRows(rights, schemaUId);
     return [...headerRows, "", ...scriptRows].join("\n");
@@ -79,3 +79,5 @@ const getSchemaVariable = (schemaUId) =>
 
 const getSchmeaVariableName = () =>
     "rightsSchemaUId"
+
+export default generateScript;

@@ -2,10 +2,13 @@ import sql from "mssql"
 import fs from "fs"
 import util from "util"
 
-import { generateScript } from "./postgreFormatter.js"
+import postgreFormatter from "./postgreFormatter.js"
+import mssqlFormatter from "./mssqlFormatter.js"
+
+import { sqlFormat } from "./constants/constants.js"
 import { getOperationRightsRequest, getTableCaption } from "./requests.js"
 
-export const generate = async (dbConfig, schemaUId, filePath) => {
+export const generate = async (dbConfig, schemaUId, filePath, format) => {
     await sql.connect(dbConfig);
     const rightsRequest = getOperationRightsRequest(schemaUId);
     const tableRequest = getTableCaption(schemaUId, "1A778E3F-0A8E-E111-84A3-00155D054C03");
@@ -23,7 +26,10 @@ export const generate = async (dbConfig, schemaUId, filePath) => {
 
     if (rightsResult && rightsResult.rowsAffected){
     	const rights = rightsResult.recordset;
-    	const script = generateScript(tableCaption, schemaUId, rights);
+		const formatter = (format === sqlFormat.PostgreSQL) ? 
+			postgreFormatter:
+			mssqlFormatter;
+    	const script = formatter(tableCaption, schemaUId, rights);
 
     	const writeScript = util.promisify(fs.writeFile);
     	await writeScript(filePath, script);
