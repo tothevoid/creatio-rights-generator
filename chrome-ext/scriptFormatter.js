@@ -12,7 +12,7 @@ const getHeaderRows = (tableCaption, rightsResult) => {
 
 const getScriptRows = (rightsResult, schemaUId) => {
     const schemaVariable = getSchemaVariable(schemaUId);
-    const deleteRows = getDeleteRows(schemaUId);
+    const deleteRows = getDeleteRows();
 
     const unitVariables = [];
     const insertRows = [];
@@ -67,9 +67,9 @@ const formatRightInsert = (adminUnitVariable, canRead, canAppend, canEdit, canDe
     return [insert, formattedValues];
 }
 
-const getDeleteRows = (schemaUId) => {
+const getDeleteRows = () => {
     const deleteStatement = "DELETE FROM [SysEntitySchemaOperationRight]";
-    const filter = `\tWHERE [SubjectSchemaUId] = '${schemaUId}'`;
+    const filter = `\tWHERE [SubjectSchemaUId] = @${getSchmeaVariableName()}`;
     return [deleteStatement, filter];
 }
 
