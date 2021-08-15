@@ -1,0 +1,25 @@
+button {
+    height: 30px;
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #5F9A53;
+    color:white;
+    font-weight: bold;
+}
+button:disabled{
+    background: gray;
+}
+  
+button.current {
+    box-shadow: 0 0 0 2px white,
+        0 0 0 4px black;
+}
+
+.output{
+    width: 750px;
+    height: 400px;
+    resize: none;
+}
+

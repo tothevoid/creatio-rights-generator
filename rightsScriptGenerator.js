@@ -16,11 +16,13 @@ const generate = async (dbConfig, schemaUId, filePath) => {
 		captionResult.recordset[0]: 
 		null;
 
+	const tableCaption = (caption.Caption) ? 
+		caption.Caption : 
+		caption.DefaultCaption;
+
     if (rightsResult && rightsResult.rowsAffected){
     	const rights = rightsResult.recordset;
-    	const headerRows = scriptFormatter.getHeaderRows(caption, rights);
-    	const scriptRows = scriptFormatter.getScriptRows(rights, schemaUId);
-		const script = [...headerRows, "", ...scriptRows].join("\n");
+    	const script = scriptFormatter.generateScript(tableCaption, schemaUId, rights);
 
     	const writeScript = util.promisify(fs.writeFile);
     	await writeScript(filePath, script);
