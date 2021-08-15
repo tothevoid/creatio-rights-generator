@@ -1,4 +1,4 @@
-const getOperationRightsRequest = (schemaUId) => {
+export const getOperationRightsRequest = (schemaUId) => {
     const select = "select SysAdminUnitId, CanRead, CanAppend, CanEdit, CanDelete, Position, SysAdminUnit.Name as UnitName from SysEntitySchemaOperationRight";
     const join = "join SysAdminUnit on SysAdminUnit.Id = SysEntitySchemaOperationRight.SysAdminUnitId";
     const filter = `where SubjectSchemaUId = '${schemaUId}'`;
@@ -6,7 +6,7 @@ const getOperationRightsRequest = (schemaUId) => {
     return convertToRequest([select, join, filter, order]);
 }
 
-const getTableCaption = (schemaUId, cultureId) => {
+export const getTableCaption = (schemaUId, cultureId) => {
     var select = "select SysSchemaLcz.Caption, SysSchema.Name as DefaultCaption from SysSchemaLcz";
     var join = "join SysSchema on SysSchema.Id = SysSchemaLcz.RecordId"
     var filter = `where SysSchema.UId = '${schemaUId}' and SysSchemaLcz.SysCultureId = '${cultureId}'`
@@ -15,8 +15,3 @@ const getTableCaption = (schemaUId, cultureId) => {
 
 const convertToRequest = (parts) => 
     parts.join(" ");
-
-module.exports = {
-    getOperationRightsRequest,
-    getTableCaption
-}
