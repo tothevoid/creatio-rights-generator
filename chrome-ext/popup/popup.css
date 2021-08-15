@@ -1,6 +1,7 @@
 button {
     height: 30px;
-    width: 100%;
+    width: 95%;
+    margin: 0 2.5%;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -18,8 +19,24 @@ button.current {
 }
 
 .output{
-    width: 750px;
-    height: 400px;
     resize: none;
+    width: 95%;
+    margin: 0 2.5%;
+    max-height: 600px;
+    height: auto;
+    display: block;
+    overflow: auto;
+    position: relative;
+  
 }
 
+.output-label{
+    width: 95%;
+    margin: 0 2.5%;
+}
+
+.popup-body{
+    width: 400px;
+    display: block;
+    overflow: auto;
+}

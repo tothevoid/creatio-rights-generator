@@ -5,7 +5,7 @@
     "manifest_version": 3,
     "permissions": ["storage", "activeTab", "scripting", "tabs"],
     "action": {
-      "default_popup": "popup.html",
+      "default_popup": "popup/popup.html",
       "default_icon": {
         "16": "/images/icon_16.png",
         "32": "/images/icon_32.png",
@@ -28,7 +28,7 @@
         "matches": ["<all_urls>"]
       },
       {
-        "resources": [ "popup.js"],
+        "resources": [ "popup/popup.js"],
         "matches": ["<all_urls>"]
       }
     ]

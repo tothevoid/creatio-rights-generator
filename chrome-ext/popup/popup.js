@@ -32,6 +32,9 @@ const processFormattedScript = async (response) => {
 		const sqlScript = scriptFormatter(response.caption, response.schemaUId, response.rights);
 		const outputElement = document.getElementById("output");
 		outputElement.textContent = sqlScript;
+		const popup = document.querySelector(".popup-body");
+		popup.style.width = "600px";
+		outputElement.style.height = "300px";
 	}
 }
 
