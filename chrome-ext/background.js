@@ -1,39 +1,39 @@
-var formatScriptBtn = document.getElementById('formatScript');
-
-formatScriptBtn.addEventListener("click", async () => {
-	debugger;
-	formatScriptBtn.disabled = true;
-	const src = chrome.runtime.getURL("scriptFormatter.js");
-	const contentMain = await import(src);
-
-  	let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-	chrome.scripting.executeScript({
-		target: { tabId: tab.id },
-    	function: getSchemaAndToken
-  	}, (injectionResults) => {
-    if (injectionResults && injectionResults.length !== 0){
-    	const injectionResult = injectionResults[0];
-    	if (injectionResult && injectionResult.result.token && injectionResult.result.schemaUId){
-			chrome.runtime.sendMessage({
-        		token: injectionResult.result.token,
-        		url: injectionResult.result.url,  
-          		schemaUId: injectionResult.result.schemaUId}, 
-        	async (response) => {
-				formatScriptBtn.disabled = false;
-          		const sqlScript = contentMain.generateScript(response.caption, injectionResult.result.schemaUId, response.rights);
-          		var outputElement = document.getElementById('result');
-          		outputElement.textContent = sqlScript;
-        });
-      }
+chrome.runtime.onMessage.addListener(
+    (request, sender, callback) => {
+        getSchemaRights(request.url, request.schemaUId, request.token, callback);
+        return true;
     }
-  });
-});
+);
 
-const getSchemaAndToken = () => {
-	const token = document.cookie.split("=")[1];
-	const urlParts = window.location.href.split("/");
-	const schemaUId = urlParts[urlParts.length - 1];
-	const url = location.origin;
+const getSchemaRights = (url, schemaUId, token, callback) => {
+    fetch(`${url}/0/ServiceModel/RightManagementService.svc/GetAdministratedObject`, {
+        method: 'POST', 
+        body: JSON.stringify({schemaUId: schemaUId}), 
+        headers: {
+            'Content-Type': 'application/json',
+            "BPMCSRF": token
+        }
+    }).then(response => response.json())
+    .then((response) => {
+		if (response && response.administratedObject){
+        	const object = response.administratedObject;
+        	const rights = object.entitySchemaOperationsRights;
+        	if (rights && rights.length !== 0){
+        		const mappedRights = rights.map(right => mapRight(right))
+          		callback({caption: object.caption, rights: mappedRights, schemaUId: schemaUId});
+        	}
+      	}
+    });
+}
 
-	return {url, token, schemaUId}
+const mapRight = (right) => {
+	return {
+		SysAdminUnitId: right.sysAdminUnit.id,
+		UnitName: right.sysAdminUnit.name,
+		CanRead: right.canRead,
+		CanAppend: right.canAppend,
+		CanEdit: right.canEdit,
+		CanDelete: right.canDelete,
+		Position: right.position
+	}
 }
