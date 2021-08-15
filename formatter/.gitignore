@@ -44,4 +44,4 @@ node_modules/
 
 #Specific
 *.sql
-./formatter/devConfig.js
+devConfig.js
