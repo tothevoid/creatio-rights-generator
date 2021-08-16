@@ -14,7 +14,7 @@ const sendFormatMessage = (injectionResults) => {
 		const injectionResult = injectionResults[0];
 		if (injectionResult && injectionResult.result?.token && 
 			injectionResult.result?.schemaUId && 
-			injectionResult.result?.schemaUId){
+			injectionResult.result?.url){
 				chrome.runtime.sendMessage({
 					token: injectionResult.result.token,
 					url: injectionResult.result.url,  
@@ -35,6 +35,15 @@ const processFormattedScript = async (response) => {
 		const popup = document.querySelector(".popup-body");
 		popup.style.width = "600px";
 		outputElement.style.height = "300px";
+		
+		const isBind = document.getElementById("bind-checkbox").checked;
+		if (isBind){
+			const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+			chrome.scripting.executeScript({
+				target: { tabId: tab.id },
+				function: getCreatioServerParameters
+			}, bindToPackage);
+		}
 	}
 }
 
@@ -59,4 +68,26 @@ const getCreatioServerParameters = () => {
 		}
 	}
 	return null;
+}
+
+const bindToPackage = (injectionResults) => {
+	if (injectionResults && injectionResults.length !== 0){
+		const injectionResult = injectionResults[0];
+		const outputElement = document.getElementById("output");
+		if (injectionResult.result?.token &&
+			injectionResult.result?.url && outputElement && 
+			outputElement.textContent){
+			fetch(`${injectionResult.result.url}/0/rest/RightsScriptGeneratorService/GenerateScript`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"BPMCSRF": injectionResult.result.token
+				},
+				body: JSON.stringify({scriptName: "test4", 
+					"script": outputElement.textContent })
+				}
+			).then(res => res.json())
+			.then(res => chrome.tabs.create({ url: res.GenerateScriptResult.ScriptUrl }));
+		}
+	}
 }

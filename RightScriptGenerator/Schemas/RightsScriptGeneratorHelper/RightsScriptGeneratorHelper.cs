@@ -136,7 +136,7 @@ namespace Terrasoft.Configuration.RightsScriptGenerator
 				Guid currentPackageId = GetPackageId(currentPackageUid);
 				if (currentPackageId != Guid.Empty)
                 {
-					return currentPackageUid;
+					return currentPackageId;
 				}
 			}
 
