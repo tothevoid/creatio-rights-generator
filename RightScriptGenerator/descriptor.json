@@ -1,0 +1,15 @@
+﻿{
+  "Descriptor": {
+    "UId": "0b10a4ca-0c0f-4639-8965-0952cb3bfaa8",
+    "Name": "RightScriptGenerator",
+    "ModifiedOnUtc": "\/Date(1629127085000)\/",
+    "Maintainer": "Customer",
+    "DependsOn": [
+      {
+        "UId": "5be3998b-c5c3-42bb-a01c-2e4149059a97",
+        "PackageVersion": "7.8.0",
+        "Name": "Base"
+      }
+    ]
+  }
+}

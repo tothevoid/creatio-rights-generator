@@ -1,0 +1,9 @@
+﻿{
+  "Descriptor": {
+    "UId": "e44f4676-5ced-4f68-93fd-56cc97f017b8",
+    "Name": "RightsScriptGeneratorService",
+    "ModifiedOnUtc": "\/Date(1629110426000)\/",
+    "ManagerName": "SourceCodeSchemaManager",
+    "Caption": "Сервис генерации прав"
+  }
+}
