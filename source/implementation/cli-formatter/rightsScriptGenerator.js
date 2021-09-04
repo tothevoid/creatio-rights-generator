@@ -2,10 +2,7 @@ import sql from "mssql"
 import fs from "fs"
 import util from "util"
 
-import postgreFormatter from "./postgreFormatter.js"
-import mssqlFormatter from "./mssqlFormatter.js"
-
-import { sqlFormat } from "./constants/constants.js"
+import getFormatter from "../../formatter/formatter.js"
 import { getOperationRightsRequest, getTableCaption } from "./requests.js"
 
 export const generate = async (dbConfig, schemaUId, filePath, format) => {
@@ -26,9 +23,7 @@ export const generate = async (dbConfig, schemaUId, filePath, format) => {
 
     if (rightsResult && rightsResult.rowsAffected){
     	const rights = rightsResult.recordset;
-		const formatter = (format === sqlFormat.PostgreSQL) ? 
-			postgreFormatter:
-			mssqlFormatter;
+		const formatter = getFormatter(format);
     	const script = formatter(tableCaption, schemaUId, rights);
 
     	const writeScript = util.promisify(fs.writeFile);

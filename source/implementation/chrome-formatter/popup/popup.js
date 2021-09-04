@@ -50,7 +50,7 @@ const processFormattedScript = async (response) => {
 }
 
 const getScriptFormatter = async () => {
-	const src = chrome.runtime.getURL("scriptFormatter.js");
+	const src = chrome.runtime.getURL("formatter.js");
 	if (src){
 		const formatterModule = await import(src);
 		return formatterModule?.generateScript;
