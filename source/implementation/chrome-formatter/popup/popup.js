@@ -1,3 +1,6 @@
+import "./popup.css";
+import formatter from "../../../formatter/formatter.js"
+
 var formatScriptBtn = document.getElementById("format-btn");
 
 formatScriptBtn.addEventListener("click", async () => {
@@ -30,7 +33,7 @@ const processFormattedScript = async (response) => {
 	if (response && response.caption && response.rights && 
 		response.rights.length !== 0 && response.schemaUId){
 		chrome.storage.sync.set({schemaUId: response.schemaUId});
-		const scriptFormatter = await getScriptFormatter();
+		const scriptFormatter = formatter(0);
 		const sqlScript = scriptFormatter(response.caption, response.schemaUId, response.rights);
 		const outputElement = document.getElementById("output");
 		outputElement.textContent = sqlScript;
@@ -47,15 +50,6 @@ const processFormattedScript = async (response) => {
 			}, bindToPackage);
 		}
 	}
-}
-
-const getScriptFormatter = async () => {
-	const src = chrome.runtime.getURL("formatter.js");
-	if (src){
-		const formatterModule = await import(src);
-		return formatterModule?.generateScript;
-	}
-	return null;
 }
 
 const getCreatioServerParameters = () => {
