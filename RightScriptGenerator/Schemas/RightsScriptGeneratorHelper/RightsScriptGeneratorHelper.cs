@@ -35,13 +35,14 @@ namespace Terrasoft.Configuration.RightsScriptGenerator
 			UserConnection = userConnection;
 		}
 		
-		public GenerationResult GenerateScript(string scriptName, string script, string mainUrl)
+		public GenerationResult GenerateScript(string script, Guid schemaUId, string mainUrl)
         {
-			if (string.IsNullOrEmpty(scriptName) || string.IsNullOrEmpty(script) || string.IsNullOrEmpty(mainUrl))
+			if (string.IsNullOrEmpty(script) || string.IsNullOrEmpty(mainUrl))
             {
 				return new GenerationResult();
 			}
 
+			string scriptName = GenerateScriptName(schemaUId);
 			var (scriptId, scriptPackageId) = CheckIsScriptAlreadyExists(scriptName);
 			if (scriptId != Guid.Empty)
             {
@@ -55,7 +56,17 @@ namespace Terrasoft.Configuration.RightsScriptGenerator
 				return new GenerationResult(newScriptId, packageId, mainUrl);
 			}
 		}
-		
+
+		private string GenerateScriptName(Guid schemaUId)
+		{
+			var select = new Select(UserConnection)
+				.Column(nameof(SysSchema.Name))
+				.From(nameof(SysSchema))
+				.Where(nameof(SysSchema.UId)).IsEqual(Column.Const(schemaUId)) as Select;
+
+			return $"SysEntitySchemaOperationRight_{select.ExecuteScalar<string>()}";
+		}
+
 		private void UpdateExisting(Guid id, string script)
         {
 			var update = new Update(UserConnection, nameof(SysPackageSqlScript))

@@ -21,14 +21,14 @@ namespace Terrasoft.Configuration.RightsScriptGenerator
 		[OperationContract]
 		[WebInvoke(Method = "POST", RequestFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Wrapped,
 			ResponseFormat = WebMessageFormat.Json)]
-		public GenerationResult GenerateScript(string scriptName, string script)
+		public GenerationResult GenerateScript(string script, Guid schemaUId)
 		{
 			Uri request = HttpContext.Current?.Request.Url;
 			string mainUrl = $"{request.Scheme}://{request.Host}:{request.Port}/0";
 
-			return (string.IsNullOrEmpty(scriptName) || string.IsNullOrEmpty(script)) ?
+			return string.IsNullOrEmpty(script) ?
 				new GenerationResult():
-				GeneratorHelper.GenerateScript(scriptName, script, mainUrl);
+				GeneratorHelper.GenerateScript(script, schemaUId, mainUrl);
 		}
 	}
 }

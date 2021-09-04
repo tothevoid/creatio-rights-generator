@@ -15,11 +15,12 @@ const sendFormatMessage = (injectionResults) => {
 		if (injectionResult && injectionResult.result?.token && 
 			injectionResult.result?.schemaUId && 
 			injectionResult.result?.url){
-				chrome.runtime.sendMessage({
-					token: injectionResult.result.token,
-					url: injectionResult.result.url,  
-					schemaUId: injectionResult.result.schemaUId}, 
-				processFormattedScript);
+			const parameters = {
+				token: injectionResult.result.token,
+				url: injectionResult.result.url,  
+				schemaUId: injectionResult.result.schemaUId
+			}
+			chrome.runtime.sendMessage(parameters, processFormattedScript);
 		}
 	}
 }
@@ -28,6 +29,7 @@ const processFormattedScript = async (response) => {
 	formatScriptBtn.disabled = false;
 	if (response && response.caption && response.rights && 
 		response.rights.length !== 0 && response.schemaUId){
+		chrome.storage.sync.set({schemaUId: response.schemaUId});
 		const scriptFormatter = await getScriptFormatter();
 		const sqlScript = scriptFormatter(response.caption, response.schemaUId, response.rights);
 		const outputElement = document.getElementById("output");
@@ -70,24 +72,32 @@ const getCreatioServerParameters = () => {
 	return null;
 }
 
-const bindToPackage = (injectionResults) => {
-	if (injectionResults && injectionResults.length !== 0){
-		const injectionResult = injectionResults[0];
-		const outputElement = document.getElementById("output");
-		if (injectionResult.result?.token &&
-			injectionResult.result?.url && outputElement && 
-			outputElement.textContent){
-			fetch(`${injectionResult.result.url}/0/rest/RightsScriptGeneratorService/GenerateScript`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					"BPMCSRF": injectionResult.result.token
-				},
-				body: JSON.stringify({scriptName: "test4", 
-					"script": outputElement.textContent })
-				}
-			).then(res => res.json())
-			.then(res => chrome.tabs.create({ url: res.GenerateScriptResult.ScriptUrl }));
+const bindToPackage = async (injectionResults) => {
+	chrome.storage.sync.get("schemaUId", (result) => {
+		if (injectionResults && injectionResults.length !== 0){
+			const injectionResult = injectionResults[0];
+			const outputElement = document.getElementById("output");
+			if (injectionResult.result?.token &&
+				injectionResult.result?.url && outputElement && 
+				outputElement.textContent){
+				fetch(`${injectionResult.result.url}/0/rest/RightsScriptGeneratorService/GenerateScript`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"BPMCSRF": injectionResult.result.token
+					},
+					body: JSON.stringify({
+						script: outputElement.textContent,
+						schemaUId: result.schemaUId
+					})
+					}
+				).then(res => res.json())
+				.then(res => {
+					if (res?.GenerateScriptResult?.IsSuccessful && res?.GenerateScriptResult?.ScriptUrl){
+						chrome.tabs.create({ url: res.GenerateScriptResult.ScriptUrl })
+					}
+				});
+			}
 		}
-	}
+	});
 }
