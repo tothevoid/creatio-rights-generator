@@ -1,7 +1,7 @@
 import "./popup.css";
 import formatter from "../../../formatter/formatter.js"
 
-var formatScriptBtn = document.getElementById("format-btn");
+const formatScriptBtn = document.getElementById("format-btn");
 
 formatScriptBtn.addEventListener("click", async () => {
 	formatScriptBtn.disabled = true;
@@ -33,7 +33,8 @@ const processFormattedScript = async (response) => {
 	if (response && response.caption && response.rights && 
 		response.rights.length !== 0 && response.schemaUId){
 		chrome.storage.sync.set({schemaUId: response.schemaUId});
-		const scriptFormatter = formatter(0);
+		const dbType = document.getElementById("db-type")?.value || 0;
+		const scriptFormatter = formatter(parseInt(dbType));
 		const sqlScript = scriptFormatter(response.caption, response.schemaUId, response.rights);
 		const outputElement = document.getElementById("output");
 		outputElement.textContent = sqlScript;

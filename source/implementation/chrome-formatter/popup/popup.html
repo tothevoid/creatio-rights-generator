@@ -5,6 +5,10 @@
   <body class="popup-body">
     <button id="format-btn">Generate script</button>
     <input type="checkbox" id="bind-checkbox">Bind to package</button>
+    <select id="db-type">
+      <option value=0>MSSQL</option>
+      <option value=1>PostgreSQL</select>
+    </select>
     <p class="output-label">Script:</p>
     <textarea class="output" id="output"></textarea>
     <script type="module" src="popup.js"></script>
