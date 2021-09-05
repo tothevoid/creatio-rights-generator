@@ -20,7 +20,7 @@ const getSchemaRights = (url, schemaUId, token, callback) => {
         	const rights = object.entitySchemaOperationsRights;
         	if (rights && rights.length !== 0){
         		const mappedRights = rights.map(right => mapRight(right))
-          		callback({caption: object.caption, rights: mappedRights, schemaUId: schemaUId});
+          		callback({caption: object.caption, rights: mappedRights, schemaUId: schemaUId, url: url});
         	}
       	}
     });

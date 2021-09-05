@@ -3,20 +3,34 @@ import formatter from "../../../formatter/formatter.js"
 
 const formatScriptBtn = document.getElementById("format-btn");
 
-if (dbTypeInput){
-	chrome.storage.sync.get("dbType", (result) => {
-		const dbTypeInput = document.getElementById("db-type");
-		if (typeof(result?.dbType) === "number"){
-			dbTypeInput.value = result.dbType;
-		} else {
-			chrome.storage.sync.set({dbType: 0});
-		}
+chrome.storage.sync.get("dbType", async (result) => {
+	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+	const dbTypeInput = document.getElementById("db-type");
+	if (typeof(result?.dbType) === "number"){
+		dbTypeInput.value = result.dbType;
+	} else {
+		chrome.storage.sync.set({dbType: 0});
+	}
 
-		dbTypeInput.addEventListener("change", (event) => {
-			const value = event.target?.value || 0;
-			chrome.storage.sync.set({dbType: parseInt(value)});
-		})
+	dbTypeInput.addEventListener("change", (event) => {
+		const value = event.target?.value || 0;
+		chrome.storage.sync.set({dbType: parseInt(value)});
 	})
+
+	chrome.scripting.executeScript({
+		target: { tabId: tab.id },
+		function: getCreatioServerParameters
+	}, updateSQLText);
+})
+
+const updateSQLText = (parameters) => {
+	chrome.storage.sync.get("script", async (result) => {
+		console.log(parameters);
+		console.log(result);
+		if (result?.script?.url === parameters[0].result?.url){
+			updateOutput(result.script.text);
+		}
+	});
 }
 
 formatScriptBtn.addEventListener("click", async () => {
@@ -52,11 +66,8 @@ const processFormattedScript = async (response) => {
 		const dbType = document.getElementById("db-type")?.value || 0;
 		const scriptFormatter = formatter(parseInt(dbType));
 		const sqlScript = scriptFormatter(response.caption, response.schemaUId, response.rights);
-		const outputElement = document.getElementById("output");
-		outputElement.textContent = sqlScript;
-		const popup = document.querySelector(".popup-body");
-		popup.style.width = "600px";
-		outputElement.style.height = "300px";
+		updateOutput(sqlScript);
+		chrome.storage.sync.set({script: {url: response.url, text: sqlScript}});
 		
 		const isBind = document.getElementById("bind-checkbox").checked;
 		if (isBind){
@@ -111,4 +122,12 @@ const bindToPackage = async (injectionResults) => {
 			}
 		}
 	});
+}
+
+const updateOutput = (script) => {
+	const outputElement = document.getElementById("output");
+	outputElement.textContent = script;
+	const popup = document.querySelector(".popup-body");
+	popup.style.width = "600px";
+	outputElement.style.height = "300px";
 }
