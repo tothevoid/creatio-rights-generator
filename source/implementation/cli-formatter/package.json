@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index.js"
+    "test": "node app.js DC257B41-06E9-468A-9EC2-39D4FCC920AA"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "commander": "^8.1.0",
+    "inquirer": "^8.1.2",
     "mssql": "^7.2.0"
   },
   "type": "module"

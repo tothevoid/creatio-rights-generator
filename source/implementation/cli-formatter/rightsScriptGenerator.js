@@ -28,6 +28,5 @@ export const generate = async (dbConfig, schemaUId, filePath, format) => {
 
     	const writeScript = util.promisify(fs.writeFile);
     	await writeScript(filePath, script);
-		console.log("Successfully generated")
     }
 }
