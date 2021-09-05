@@ -3,6 +3,22 @@ import formatter from "../../../formatter/formatter.js"
 
 const formatScriptBtn = document.getElementById("format-btn");
 
+if (dbTypeInput){
+	chrome.storage.sync.get("dbType", (result) => {
+		const dbTypeInput = document.getElementById("db-type");
+		if (typeof(result?.dbType) === "number"){
+			dbTypeInput.value = result.dbType;
+		} else {
+			chrome.storage.sync.set({dbType: 0});
+		}
+
+		dbTypeInput.addEventListener("change", (event) => {
+			const value = event.target?.value || 0;
+			chrome.storage.sync.set({dbType: parseInt(value)});
+		})
+	})
+}
+
 formatScriptBtn.addEventListener("click", async () => {
 	formatScriptBtn.disabled = true;
   	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
