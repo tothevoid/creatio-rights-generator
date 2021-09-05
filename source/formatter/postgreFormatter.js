@@ -1,13 +1,9 @@
+import { getHeaderRows, getSchemaVariableName } from "./common.js"
+
 const generateScript = (tableCaption, schemaUId, rights) => {
     const headerRows = getHeaderRows(tableCaption, rights);
     const scriptRows = getScriptRows(rights, schemaUId);
     return [...headerRows, "", ...scriptRows].join("\n");
-}
-
-const getHeaderRows = (tableCaption, rightsResult) => {
-    const header = `Настройка прав доступа по операциям на объект \"${tableCaption}\"`;
-    const roles = rightsResult.map(right => formatRole(right.SysAdminUnitId, right.UnitName));
-    return ["/*", header, ...roles, "*/"];
 }
 
 const getScriptRows = (rightsResult, schemaUId) => {
@@ -18,7 +14,7 @@ const getScriptRows = (rightsResult, schemaUId) => {
     const insertRows = [];
 
     insertRows.push(formatInsertStatement());
-    rightsResult.forEach((right, ix) => {
+    rightsResult.forEach((right) => {
         const variableName = getVariableName(right.UnitName);
         unitVariables.push(getVariableDeclareStatement(variableName, right.SysAdminUnitId));
         insertRows.push(formatInsert(variableName, right.CanRead, 
@@ -38,10 +34,6 @@ const getScriptRows = (rightsResult, schemaUId) => {
         "END;",
         "$$"
     ];
-}
-
-const formatRole = (roleId, roleName) => {
-    return `'${roleId}' - ${roleName}`
 }
 
 const getVariableName = (sysAdminUnitName) => {
@@ -65,19 +57,16 @@ const formatInsert = (adminUnitVariable, canRead, canAppend, canEdit, canDelete,
         +canEdit,
         +canDelete,
         position,
-        `@${getSchmeaVariableName()}`
+        `@${getSchemaVariableName()}`
     ]
     const formattedValues = `\t(${values.join(", ")})`;
     return formattedValues;
 }
 
 const getDeleteRows = () =>
-    `\tDELETE FROM "SysEntitySchemaOperationRight" WHERE "SubjectSchemaUId" = ${getSchmeaVariableName()}`;
+    `\tDELETE FROM "SysEntitySchemaOperationRight" WHERE "SubjectSchemaUId" = ${getSchemaVariableName()}`;
 
 const getSchemaVariable = (schemaUId) => 
-    `\t${getSchmeaVariableName()} uuid = '${schemaUId}';`
-
-const getSchmeaVariableName = () =>
-    "rightsSchemaUId"
+    `\t${getSchemaVariableName()} uuid = '${schemaUId}';`
 
 export default generateScript;

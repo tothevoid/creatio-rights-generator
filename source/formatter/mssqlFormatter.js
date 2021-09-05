@@ -1,13 +1,9 @@
+import { getHeaderRows, getSchemaVariableName } from "./common.js"
+
 const generateScript = (tableCaption, schemaUId, rights) => {
     const headerRows = getHeaderRows(tableCaption, rights);
     const scriptRows = getScriptRows(rights, schemaUId);
     return [...headerRows, "", ...scriptRows].join("\n");
-}
-
-const getHeaderRows = (tableCaption, rightsResult) => {
-    const header = `Настройка прав доступа по операциям на объект \"${tableCaption}\"`;
-    const roles = rightsResult.map(right => formatRole(right.SysAdminUnitId, right.UnitName));
-    return ["/*", header, ...roles, "*/"];
 }
 
 const getScriptRows = (rightsResult, schemaUId) => {
@@ -39,10 +35,6 @@ const getScriptRows = (rightsResult, schemaUId) => {
     ];
 }
 
-const formatRole = (roleId, roleName) => {
-    return `'${roleId}' - ${roleName}`
-}
-
 const getVariableName = (sysAdminUnitName) => {
     const clearedVariable = sysAdminUnitName.replace(/\s/g, "");
     return `${clearedVariable.charAt(0).toLowerCase()}${clearedVariable.slice(1)}Id`;
@@ -61,7 +53,7 @@ const formatRightInsert = (adminUnitVariable, canRead, canAppend, canEdit, canDe
         +canEdit,
         +canDelete,
         position,
-        `@${getSchmeaVariableName()}`
+        `@${getSchemaVariableName()}`
     ]
     const formattedValues = `\tVALUES (${values.join(", ")})`;
     return [insert, formattedValues];
@@ -69,14 +61,11 @@ const formatRightInsert = (adminUnitVariable, canRead, canAppend, canEdit, canDe
 
 const getDeleteRows = () => {
     const deleteStatement = "DELETE FROM [SysEntitySchemaOperationRight]";
-    const filter = `\tWHERE [SubjectSchemaUId] = @${getSchmeaVariableName()}`;
+    const filter = `\tWHERE [SubjectSchemaUId] = @${getSchemaVariableName()}`;
     return [deleteStatement, filter];
 }
 
 const getSchemaVariable = (schemaUId) => 
-    `DECLARE @${getSchmeaVariableName()} uniqueidentifier = '${schemaUId}';`
-
-const getSchmeaVariableName = () =>
-    "rightsSchemaUId"
+    `DECLARE @${getSchemaVariableName()} uniqueidentifier = '${schemaUId}';`
 
 export default generateScript;
