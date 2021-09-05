@@ -24,13 +24,23 @@ chrome.storage.sync.get("dbType", async (result) => {
 })
 
 const updateSQLText = (parameters) => {
-	chrome.storage.sync.get("script", async (result) => {
-		console.log(parameters);
-		console.log(result);
-		if (result?.script?.url === parameters[0].result?.url){
-			updateOutput(result.script.text);
+	if (parameters && parameters[0] && parameters[0]?.result)
+	{
+		const {isCorrectUrl, url} = parameters[0]?.result;
+
+		if (parameters[0].result?.isCorrectUrl){
+			const placeholder = document.getElementById("placeholder");
+			if (placeholder){
+				placeholder.remove();
+			}
 		}
-	});
+	
+		chrome.storage.sync.get("script", async (result) => {
+			if (result?.script?.url === url){
+				updateOutput(result.script.text);
+			}
+		});
+	}
 }
 
 formatScriptBtn.addEventListener("click", async () => {
@@ -84,11 +94,13 @@ const getCreatioServerParameters = () => {
 	if (document?.cookie && window?.location?.href && location?.origin){
 		const cookies = document.cookie.split("=");
 		const urlParts = window.location.href.split("/");
+		const isCorrectUrl = urlParts && urlParts.length > 2 && 
+			urlParts[urlParts.length - 2] === "AdministratedObjects";
 		if (cookies && cookies.length >= 1 && urlParts && urlParts.length !== 0){
 			const token = cookies[1];
 			const schemaUId = urlParts[urlParts.length - 1];
 			const url = location.origin;
-			return {url, token, schemaUId}
+			return {url, token, schemaUId, isCorrectUrl}
 		}
 	}
 	return null;

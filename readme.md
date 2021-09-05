@@ -4,3 +4,8 @@ A set of tools which allows you to generate sql scripts on creatio schemas right
 
 * Chrome extension (script generation, package binding)
 * CLI
+
+Supported DBs:
+
+* MSSQL
+* PostgreSQL
